@@ -9,9 +9,3 @@ app.get('/info')
 
 app.listen(port, ()=>{
     console.log( "Your application is running on http://localhost:3000")});
-
-
-
-
-
-
