@@ -10,10 +10,11 @@ const users = [];
 app.use(express.urlencoded({ extended : false}));
 
 app.post('/register', async (req, res) => {
+    //  running try catch to validate users
 
     try {
         const hashedPassword = await bcrypt.hash(req.body.password);
-        
+
     } catch (error) {
         
     }
