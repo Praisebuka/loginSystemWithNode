@@ -11,6 +11,7 @@ const passport = require("passport");
 const initializePassport = require("./passport_config");
 const flashmessage = require("express-flash");
 const  session = require("express-session");
+const methodOverride = require("method-override");
 const port = process.env.PORT ||3000;
 app.set('view engine', 'ejs');
 
@@ -32,6 +33,7 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(methodOverride("_method"));
 
 // Configuring the  post method for the registration page
 app.post('/register', checkNotAuthUsers, async (req, res) => {
@@ -77,6 +79,13 @@ app.get('/register', checkNotAuthUsers, (req, res) => {
 
 app.get('/login', checkNotAuthUsers, (req, res) => {
     res.render("login.ejs");
+});
+
+app.delete('/logout', (req, res) => {
+    req.logOut(req.user, err => { 
+        if (err) return next(err)
+        res.redirect("/")
+    });
 });
 // define required routes ends
 
