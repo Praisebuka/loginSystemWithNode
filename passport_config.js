@@ -11,7 +11,9 @@ function initialize (passport, getUsersByEmail, getUsersById) {
         // Getting users by their email
         const user = getUsersByEmail(email);
             if (user == null) {
-                return done(null, false, {message: "Sorry no user has been found with that email on our end."});
+                return done(null, false, {
+                    message: "Sorry no user has been found with that email or password on our end."
+                });
             }
 
 
