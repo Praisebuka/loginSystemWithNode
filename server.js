@@ -1,19 +1,39 @@
+if (process.env.NODE_ENV !== "production") {
+    require("dotenv").config();
+}
+
+
 // Importing preinstalled libraries
 const express = require("express");
 const app = express();
 const bcrypt = require("bcrypt");
 const passport = require("passport");
 const initializePassport = require("./passport_config");
-
-initializePassport(passport);
-
+const flashmessage = require("express-flash");
+const  session = require("express-session");
 const port = process.env.PORT ||3000;
 app.set('view engine', 'ejs');
+
+
+// Using the email to verify incoming users on the login screen
+initializePassport( passport,
+    email => users.find(user => user.email === email),
+    id => users.find(user => user.id === id)
+    );
 
 const users = [];
 
 app.use(express.urlencoded({ extended : false}));
+app.use(flashmessage());
+app.use(session({
+    secret: process.env.SECRET_KEY,
+    resave: false, // this line makes the session variable not to save if it wasn't changed
+    saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
+// Configuring the  post method for the registration page
 app.post('/register', async (req, res) => {
     // running try catch to validate users
 
@@ -39,6 +59,12 @@ app.post('/register', async (req, res) => {
 });
 
 
+// Configuring the  post method for the login page
+app.post('/login', passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/login", 
+    failureFlash: true
+}));
 
 // define required routes starts
 app.get('/', (req, res) => {
@@ -55,7 +81,7 @@ app.get('/login', (req, res) => {
 // define required routes ends
 
 
-
 // configuring server
 app.listen(port, ()=>{
-    console.log( "Your application is running on http://localhost:3000")});
+    console.log( "Your application is running on http://localhost:3000")
+});
