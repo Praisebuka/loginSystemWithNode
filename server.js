@@ -34,7 +34,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Configuring the  post method for the registration page
-app.post('/register', async (req, res) => {
+app.post('/register', checkNotAuthUsers, async (req, res) => {
     // running try catch to validate users
 
     try {
@@ -60,26 +60,39 @@ app.post('/register', async (req, res) => {
 
 
 // Configuring the  post method for the login page
-app.post('/login', passport.authenticate("local", {
+app.post('/login', checkNotAuthUsers, passport.authenticate("local", {
     successRedirect: "/",
     failureRedirect: "/login", 
     failureFlash: true
 }));
 
 // define required routes starts
-app.get('/', (req, res) => {
-    res.render("index.ejs");
+app.get('/', checkAuthUsers, (req, res) => {
+    res.render("index.ejs", {name: req.user.name});
 });
 
-app.get('/register', (req, res) => {
+app.get('/register', checkNotAuthUsers, (req, res) => {
     res.render("register.ejs");
 });
 
-app.get('/login', (req, res) => {
+app.get('/login', checkNotAuthUsers, (req, res) => {
     res.render("login.ejs");
 });
 // define required routes ends
 
+// Making fallback routes for the application
+function checkAuthUsers(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();  
+    } 
+    res.redirect("/login");
+}
+
+function checkNotAuthUsers(req, res, next) {
+    if (req.isAuthenticated()) {
+        return res.redirect("/");
+    } next();
+}
 
 // configuring server
 app.listen(port, ()=>{
